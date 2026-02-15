@@ -42,10 +42,14 @@ public class EnvironmentContainerEntity(IServiceProvider provider) : Entity("env
 
     public override void OnAttached()
     {
+        AddCapability(ActivatorUtilities.CreateInstance<EnvironmentLifetimeCapability>(_serviceProvider, this));
         AddCapability(ActivatorUtilities.CreateInstance<LightContainerCapability>(_serviceProvider, this));
         AddCapability(ActivatorUtilities.CreateInstance<TimeWeatherCapability>(_serviceProvider, this));
+        AddCapability(ActivatorUtilities.CreateInstance<SkyEditorCapability>(_serviceProvider, this));
+        AddCapability(ActivatorUtilities.CreateInstance<EnvironmentEditorCapability>(_serviceProvider, this));
         AddCapability(ActivatorUtilities.CreateInstance<FestivalCapability>(_serviceProvider, this));
         AddCapability(ActivatorUtilities.CreateInstance<WorldRenderingCapability>(_serviceProvider, this));
+        AddCapability(ActivatorUtilities.CreateInstance<DebugEnvironmentCapability>(_serviceProvider, this));
     }
 
     public override void OnChildAttached() => SortChildren();

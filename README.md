@@ -1,6 +1,6 @@
-# Brio
+# BRIO ![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/Etheirys/Brio/total?style=flat) ![GitHub License](https://img.shields.io/github/license/Etheirys/Brio?style=flat) ![Bluesky followers](https://img.shields.io/bluesky/followers/minmoose.bsky.social?style=flat&label=bluesky%20followers)
 
-### Brio is a tool for FFXIV to enhance the GPosing experience. 
+> Brio is a tool for FFXIV to enhance the GPosing experience. 
 Brio is currently in alpha, and as such, there may be bugs. If you find any, please report them!
 
 ## Features

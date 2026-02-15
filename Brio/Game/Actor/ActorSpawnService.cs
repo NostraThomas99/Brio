@@ -11,18 +11,21 @@ using Brio.Game.Posing;
 using Brio.Game.Types;
 using Brio.IPC;
 using Brio.Resources;
+using Brio.Services;
+using Brio.Services.MediatorMessages;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+
 using CharacterCopyFlags = FFXIVClientStructs.FFXIV.Client.Game.Character.CharacterSetupContainer.CopyFlags;
 using ClientObjectManager = FFXIVClientStructs.FFXIV.Client.Game.Object.ClientObjectManager;
 using NativeCharacter = FFXIVClientStructs.FFXIV.Client.Game.Character.Character;
 
 namespace Brio.Game.Actor;
 
-public class ActorSpawnService : IDisposable
+public class ActorSpawnService : MediatorSubscriberBase
 {
     private readonly ObjectMonitorService _monitorService;
     private readonly IObjectTable _objectTable;
@@ -39,14 +42,12 @@ public class ActorSpawnService : IDisposable
     private readonly ActorLookAtService _actorLookAtService;
     private readonly CharacterHandlerService _characterHandlerService;
 
-    //private readonly BrioIPCProviders _brioIPCProviders;
-
     private readonly Dictionary<ushort, SpawnFlags> _createdIndexes = [];
 
-    public unsafe ActorSpawnService(ObjectMonitorService monitorService, /* BrioIPCProviders brioIPCProviders,*/ CustomizePlusService customizePlusService, ActorLookAtService actorLookAtService, CharacterHandlerService characterHandlerService,
+    public unsafe ActorSpawnService(Mediator mediator, ObjectMonitorService monitorService, CustomizePlusService customizePlusService, ActorLookAtService actorLookAtService, CharacterHandlerService characterHandlerService,
         ActorAppearanceService actorAppearanceService, PosingService posingService, GlamourerService glamourerService,
         EntityManager entityManager, IObjectTable objectTable, IClientState clientState, IFramework framework,
-        GPoseService gPoseService, ActorRedrawService actorRedrawService, TargetService targetService)
+        GPoseService gPoseService, ActorRedrawService actorRedrawService, TargetService targetService) : base(mediator)
     {
         _monitorService = monitorService;
         _objectTable = objectTable;
@@ -61,8 +62,6 @@ public class ActorSpawnService : IDisposable
         _actorAppearanceService = actorAppearanceService;
         _customizePlusService = customizePlusService;
 
-        //_brioIPCProviders = brioIPCProviders;
-
         _actorLookAtService = actorLookAtService;
         _characterHandlerService = characterHandlerService;
 
@@ -75,7 +74,7 @@ public class ActorSpawnService : IDisposable
     {
         outCharacter = null;
 
-        var localPlayer = _clientState.LocalPlayer;
+        var localPlayer = _objectTable.LocalPlayer;
         if(localPlayer != null)
         {
             if(CloneCharacter(localPlayer, out outCharacter, flags, disableSpawnCompanion: disableSpawnCompanion))
@@ -145,7 +144,7 @@ public class ActorSpawnService : IDisposable
                     _actorRedrawService.DrawWhenReady(companion);
             }
 
-            //_brioIPCProviders.ActorSpawned.Invoke(outCharacter);
+            Mediator.Publish(new ActorSpawnedMessage(outCharacter));
 
             return true;
         }
@@ -165,26 +164,22 @@ public class ActorSpawnService : IDisposable
                 if(entity is not null)
                 {
                     entity.GetCapability<ActionTimelineCapability>().SetOverallSpeedOverride(0);
-
-                    var acf = JsonSerializer.Deserialize<AnamnesisCharaFile>(ResourceProvider.Instance.GetRawResourceString("Data.BrioPropChar.chara"));
-                    if(acf.Race == 0 && acf.ModelType == 0)
-                    {
-                        Brio.Log.Fatal("BrioPropChar was Invalid!!");
-                    }
-                    else
-                    {
-                        entity.GetCapability<ActorAppearanceCapability>().SetAppearanceAsTask(acf, AppearanceImportOptions.Default);
-                    }
-
+                  
                     _framework.RunOnTick(() =>
                     {
-                        entity.GetCapability<PosingCapability>().LoadResourcesPose("Data.BrioPropPose.pose");
-
+                        var acf = JsonSerializer.Deserialize<AnamnesisCharaFile>(ResourceProvider.Instance.GetRawResourceString("Data.BrioPropChar.chara"));
+                        entity.GetCapability<ActorAppearanceCapability>().SetAppearanceAsTask(acf, AppearanceImportOptions.Default);
+                       
                         _framework.RunOnTick(() =>
                         {
-                            entity.GetCapability<ActorAppearanceCapability>().AttachWeapon();
-                        }, delayTicks: 5);
-                    }, delayTicks: 5);
+                            entity.GetCapability<PosingCapability>().LoadResourcesPose("Data.BrioPropPose.pose");
+
+                            _framework.RunOnTick(() =>
+                            {
+                                entity.GetCapability<ActorAppearanceCapability>().AttachWeapon();
+                            }, delayTicks: 10);
+                        }, delayTicks: 10);
+                    }, delayTicks: 10);
                 }
             },
                 100,
@@ -280,7 +275,7 @@ public class ActorSpawnService : IDisposable
 
         _ = _characterHandlerService.Revert(go, disposing);
 
-        //_brioIPCProviders.ActorDespawned.Invoke(go);
+        Mediator.Publish(new ActorDespawnedMessage(go));
     }
 
     public void DestroyCompanion(ICharacter character)
@@ -401,7 +396,7 @@ public class ActorSpawnService : IDisposable
         _createdIndexes.Clear();
     }
 
-    public unsafe void Dispose()
+    public unsafe override void Dispose()
     {
         _monitorService.CharacterDestroyed -= OnCharacterDestroyed;
         _gPoseService.OnGPoseStateChange -= OnGPoseStateChanged;
@@ -409,7 +404,7 @@ public class ActorSpawnService : IDisposable
 
         DestroyAllCreated(true);
 
-        GC.SuppressFinalize(this);
+        base.Dispose();
     }
 }
 
@@ -423,6 +418,7 @@ public enum SpawnFlags
     IsEffect = 1 << 8,
     SetDefaultAppearance = 1 << 16,
 
+    WithCompanionSlot = ReserveCompanionSlot | CopyPosition,
     Prop = IsProp | SetDefaultAppearance | CopyPosition,
     Effect = IsEffect | SetDefaultAppearance | CopyPosition,
     Default = CopyPosition,

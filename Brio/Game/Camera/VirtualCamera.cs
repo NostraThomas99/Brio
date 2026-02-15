@@ -1,5 +1,6 @@
 ﻿using FFXIVClientStructs.FFXIV.Client.Game.Control;
 using MessagePack;
+using System;
 using System.Numerics;
 
 namespace Brio.Game.Camera;
@@ -39,7 +40,11 @@ public unsafe partial class VirtualCamera
 
     public Vector3 Position = Vector3.Zero;
     public Vector3 PositionOffset = Vector3.Zero;
+    public Vector3 TargetOffset = Vector3.Zero;
     public Vector3 Rotation = Vector3.Zero;
+
+    public bool IsSelectingActor => TargetOffset != Vector3.Zero;
+    public string SelectedActorName = "Select an actor to track";
 
     public float PivotRotation
     {
@@ -109,6 +114,9 @@ public unsafe partial class VirtualCamera
 
     public Vector3 RotationAsVector3 => BrioCamera->RotationAsVector3;
 
+    public Quaternion FreeCameraRotationAsQuaternion
+        => Quaternion.CreateFromYawPitchRoll(Rotation.X + MathF.PI - Pan.X, Rotation.Y + Pan.Y, PivotRotation);
+
     private void DelimitCameraStop()
     {
         if(_originalZoomLimits.HasValue)
@@ -160,6 +168,9 @@ public unsafe partial class VirtualCamera
         FoV = 0f;
         Angle = Vector2.Zero;
         Pan = Vector2.Zero;
+
+        SelectedActorName = "Select an actor to track";
+        TargetOffset = Vector3.Zero;
     }
 
     public void SaveCameraState()

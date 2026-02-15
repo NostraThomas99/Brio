@@ -1,7 +1,9 @@
 ﻿using Brio.Capabilities.Camera;
 using Brio.Config;
+using Brio.Entities.Actor;
 using Brio.Entities.Camera;
 using Brio.Files;
+using Brio.Game.Actor.Extensions;
 using Brio.Game.Camera;
 using Brio.Game.Cutscene;
 using Brio.UI.Controls.Core;
@@ -10,6 +12,8 @@ using Dalamud.Bindings.ImGui;
 using Dalamud.Interface;
 using Dalamud.Interface.Utility;
 using Dalamud.Interface.Utility.Raii;
+using FFXIVClientStructs.FFXIV.Client.Game.Object;
+using FFXIVClientStructs.FFXIV.Client.Graphics.Scene;
 using System.IO;
 using System.Numerics;
 
@@ -139,8 +143,8 @@ public static class CameraEditor
 
                     ImGui.SameLine();
 
-                    if(ImBrio.FontIconButtonRight("resetMovementSpeed", FontAwesomeIcon.Undo, 1f, "Reset Movement Speed", moveSpeed != capability.configurationService.Configuration.Interface.DefaultFreeCameraMovementSpeed))
-                        camera.FreeCamValues.MovementSpeed = capability.configurationService.Configuration.Interface.DefaultFreeCameraMovementSpeed;
+                    if(ImBrio.FontIconButtonRight("resetMovementSpeed", FontAwesomeIcon.Undo, 1f, "Reset Movement Speed", moveSpeed != capability._configurationService.Configuration.Interface.DefaultFreeCameraMovementSpeed))
+                        camera.FreeCamValues.MovementSpeed = capability._configurationService.Configuration.Interface.DefaultFreeCameraMovementSpeed;
                 }
 
                 {
@@ -154,8 +158,8 @@ public static class CameraEditor
 
                     ImGui.SameLine();
 
-                    if(ImBrio.FontIconButtonRight("resetMouseSensitivity", FontAwesomeIcon.Undo, 1f, "Reset MouseSensitivity", mouseSpeed != capability.configurationService.Configuration.Interface.DefaultFreeCameraMouseSensitivity))
-                        camera.FreeCamValues.MouseSensitivity = capability.configurationService.Configuration.Interface.DefaultFreeCameraMouseSensitivity;
+                    if(ImBrio.FontIconButtonRight("resetMouseSensitivity", FontAwesomeIcon.Undo, 1f, "Reset MouseSensitivity", mouseSpeed != capability._configurationService.Configuration.Interface.DefaultFreeCameraMouseSensitivity))
+                        camera.FreeCamValues.MouseSensitivity = capability._configurationService.Configuration.Interface.DefaultFreeCameraMouseSensitivity;
                 }
 
                 ImGui.Separator();
@@ -177,6 +181,7 @@ public static class CameraEditor
             {
                 if(camera is not null)
                 {
+
                     var width = -ImGui.CalcTextSize("XXXXXXXXXx").X;
 
                     if(ImBrio.FontIconButtonRight("reset", FontAwesomeIcon.Undo, 1f, "Reset", camera.IsOverridden))
@@ -185,6 +190,40 @@ public static class CameraEditor
                     //
                     ImGui.Separator();
                     //
+
+                    using(ImRaii.Disabled(capability._entityManager.SelectedEntity is not ActorEntity))
+                        if(ImBrio.FontIconButton("recenter_on_selected", FontAwesomeIcon.Bullseye, "Recenter on Selected Actor"))
+                        {
+                            var entity = capability._entityManager.SelectedEntity;
+                            if(entity is ActorEntity actor)
+                            {
+                                capability.VirtualCamera.SelectedActorName = $"Selected: [ {actor.FriendlyName} ]";
+                                camera.TargetOffset = (actor.GameObject.GetDrawObject<DrawObject>()->Object.Position - ((GameObject*)actor.GameObject.Address)->Position);
+                            }
+                        }
+
+                    ImGui.SameLine();
+
+                    if(ImGui.BeginCombo($"###CameraContainerActorsWidget_{capability.Entity.Id}_list", capability.VirtualCamera.SelectedActorName))
+                    {
+                        foreach(var value in capability._entityManager.TryGetAllActors())
+                        {
+                            if(ImGui.Selectable($"[ {value.FriendlyName} ]"))
+                            {
+                                capability.VirtualCamera.SelectedActorName = $"Selected: [ {value.FriendlyName} ]";
+                                camera.TargetOffset = (value.GameObject.GetDrawObject<DrawObject>()->Object.Position - ((GameObject*)value.GameObject.Address)->Position);
+                            }
+                        }
+                        ImGui.EndCombo();
+                    }
+
+                    ImGui.SameLine();
+
+                    if(ImBrio.FontIconButtonRight("reset_selected", FontAwesomeIcon.Undo, 1f, "Reset Selected Actor", camera.IsSelectingActor))
+                    {
+                        camera.TargetOffset = new Vector3(0);
+                        camera.SelectedActorName = "Select an actor to track";
+                    }
 
                     {
                         const string offsetText = "Position";

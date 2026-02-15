@@ -230,7 +230,7 @@ public unsafe class LightingService : IDisposable
             if(_virtualCameraManager.CurrentCamera.IsFreeCamera)
             {
                 light->Transform.Position = _virtualCameraManager.CurrentCamera.Position;
-                light->Transform.Rotation = _virtualCameraManager.CurrentCamera.Rotation.ToEulerAngles();
+                light->Transform.Rotation = _virtualCameraManager.CurrentCamera.FreeCameraRotationAsQuaternion;
             }
             else
             {
@@ -663,7 +663,7 @@ public unsafe struct GameLight
     }
 }
 
-[StructLayout(LayoutKind.Explicit, Size = 0xA0)]
+[StructLayout(LayoutKind.Explicit, Size = 0x160)]
 public unsafe struct LightRenderObject
 {
     [FieldOffset(0x00)] public nint* VirtualTable;

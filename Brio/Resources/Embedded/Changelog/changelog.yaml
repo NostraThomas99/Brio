@@ -1,12 +1,130 @@
 
-tagline: "Whats New in Brio v0.6.2"
-subline: "7.4 Support & More!"
+tagline: "Brio 0.7.1, Brio's 3rd Anniversary! (Now with pose mirroring!)"
+subline: "Multi-Bone/Actor, Selection, Advanced Environment!"
 changelog:
+
+  - name: v0.7.1
+    tagline: Pose Mirroring!
+    date: "Jan 20th 2026"
+    isCurrent: true
+    versions:
+      - number: "As a reminder! If you experience any issues please report them on Discord or on GitHub"
+        icon: ""
+        items:
+          - "I have gotten successful bullied by other devs, so I made pose mirroring"
+          - "Still yet, more features coming soon, like AltherBlend integration, Auto-Save & MCDF Window"
+   
+      - number: "0.7.1.2"
+        icon: ""
+        items:
+          - "Fix spawning of actors with a CompanionSlot, Spawning at GPose origin"
+          - "Attempted to make props more stable"
+          - "Tags now properly work for .pose files (didn't know they could even have tags did you?')"
+          - "Made more improvements to pose mirroring (like fixing more hair things)"
+          - "Fixed some typos"
+ 
+      - number: "0.7.1.1"
+        icon: ""
+        items:
+          - "Fixed a few issues with flipping a pose, like your butt being inversed!"
+          - "Fixed an issue with reset bone, not resetting face bones"
+          - "Advanced Environment widgets are no longer open by default"
+          - "Updated Festivals List (Valentione's Day, Heavensturn, Little Ladies Day, Hatching Tide & more, for 2026)"
+          - "Updated Supporter list"
+
+      - number: "Mirror Pose"
+        icon: ""
+        items:
+          - "Added a `Mirror Pose` Button to both the overlay and the transform"
+   
+      - number: "Reset Body & Face"
+        icon: ""
+        items:
+          - "Added both a `Reset Body` & `Reset Face` Button to both the overlay (From live pose, thanks Caraxi!)" 
+
+      - number: "General changes and fixes in 0.7.1"
+        icon: ""
+        items:
+          - "More fixes to limbs extending like noodles"
+          - "Attempted to fix the main window from moving to the left forever"
+          - "Fixes the Animation selector from not appearing properly sometimes"
+          - "Fixed weapons now once more show up correctly in the appearance UI"
+          - "Fixed two IPC calls ActorSpawned & ActorDespawned"
+          - "Fixed a few text typos"
+
+      - number: "ATTENTION: Known issues!"
+        icon: ""
+        items:
+          - "When moving the face bones with IK on, the face jumps!"
+          - "As workaround move your IK bones before changed any face/head bones!"
+          - "Pose flipping starts to behave weirdly after you do it about.. 70 times"
+          - "Occasionally Brio Keybinds are sent to the game incorrectly"
+
+  - name: v0.7.0
+    tagline: Multi-Bone, Multi-Actor Selection, Advanced Environment & Brio's 3rd Birthday!
+    date: "Jan 16th 2026"
+    isCurrent: true
+    versions:
+    
+      - number: "0.7.0.1 (We just can't stay on a full .0 version for 24 hrs can we? :p )"
+        icon: ""
+        items:
+          - "Fixed an issue with limbs extending like noodles in certain conditions"
+          - "Fixed an issue with the changelog not appearing on update (Hello there reader of this changelog! o/)"
+
+      - number: "Dynamic Face Control"
+        icon: ""
+        items:
+          - "Added `Select actor to Track` to Dynamic Face Control (Thank you once more to Enth)"
+          - "Select the `Actor` tab once you enable dynamic face control to use it"
+          - "This will also let you Deselect an actor if your character was targeting one when you went into GPose"
+
+      - number: "Added Multi Actor Selection"
+        icon: ""
+        items:
+          - "You can now select multiple actors at a time"
+          - "Press `Ctrl` in the entity selector when clicking an actors to start selection"
+          - "The overlay will now display a button under all actors that you can click on too!"
+          - "You can press `Shift` with the new Overlay dots start selection on them"
+
+      - number: "Added Multi Bone Selection"
+        icon: ""
+        items:
+          - "I think this one is also quite clear!"
+          - "Press `Shift` when clicking a Bone to start selection"
+ 
+      - number: "Advanced Environment Settings!"
+        icon: ""
+        items:
+          - "From changing the sky the clouds or the particles falling from the sky"
+          - "You can access these settings from the Environment tab under `Sky` & `Environment`"
+          - "Made multiple improvements to the visual design of the time and weather controls"
+
+      - number: "Multiple core technical improvements"
+        icon: ""
+        items:
+          - "MCDFs now generate slightly faster by moving to BLAKE3"
+          - "Added core technical infrastructure called a `Mediator` (using darkarchon's implementation from Mare, thanks!)"
+          - "Refreshed the folder structure of Brio's source code for better organization"
+          - "Changed some internal structures of the `scene` system, please look forward to its advancement in 0.7.1!"
+
+      - number: "General changes in 0.7.0"
+        icon: ""
+        items:
+          - "The `+` or Spawn new buttton is now a unified Spawn button that lets you spawn any Brio entity"
+          - "Projects that where made in last version are incompatible with this version of Brio!"
+          - "The entity selector can now be resized across the vertical axis"   
+          - "Added two New buttons to the advanced section in the settings that will help with Support requests"
+          - "You can now hold `Ctrl` and click on an actor in the entity selector to deselected it"
+          - "A scroll bar will now appear automatically to the Main Brio window"
+          - "Slight visual fixes when if scrollbar is present on certain windows"
+          - "Fixed An issue where the overlay's Gizmo would not correctly move face bones"
+          - "Fixed an issue where the overlay's bones sometimes would display from off sreen"
 
   - name: v0.6.2
     tagline: 7.4 Support & More!
     date: "December 20th 2025"
-    isCurrent: true
+    isCurrent: false
     versions:
       - number: "ATTENTION Projects made in this version will be incompatible with the next version of Brio!"
         icon: ""
@@ -14,6 +132,23 @@ changelog:
           - "Happy Holidays Everyone!"
           - "As a reminder! If you experience any issues please report them on Discord or on GitHub"
           - "(Even more features coming real soon!)"
+     
+      - number: "0.6.2.3"
+        icon: ""
+        items:
+          - "Fixed the Festivals system"
+          - "Festivals now have a max of 8"
+
+      - number: "0.6.2.2"
+        icon: ""
+        items:
+          - "Fixed some typos in text"
+          - "Updated Penumbra API"
+
+      - number: "0.6.2.1"
+        icon: ""
+        items:
+          - "Fixed an issue with the Brio API"
 
       - number: "0.6.2"
         icon: ""
@@ -22,6 +157,8 @@ changelog:
           - "The animation search control now has more filters and can now be pinned as a window"
           - "Update Brio's IPC to v3, Contact me for more information (minmoose)"
           - "Fixed an issue with Bone selection menu, the category buttons are now tristate"
+          - "Added Starlight Celebration (2025) festival and fixed Starlight Celebration (2024) festival text" 
+          - "Fixed an issue with the camera values being duplicated incorrectly"
           - "Optimized a few systems"
 
   - name: v0.6.1

@@ -8,10 +8,10 @@ using Brio.Game.Actor.Appearance;
 using Brio.Game.Actor.Interop;
 using Brio.Game.Core;
 using Brio.Game.Posing;
-using Brio.Game.Scene;
 using Brio.Game.Types;
 using Brio.Library;
 using Brio.Library.Filters;
+using Brio.Services;
 using Brio.UI.Controls.Core;
 using Brio.UI.Controls.Editors;
 using Brio.UI.Windows;
@@ -58,10 +58,12 @@ public class FileUIHelpers
                     if(ImGui.Button("Export Scene"))
                     {
                         ShowExportSceneModal(entityManager, sceneService);
+                        ImBrio.AttachToolTip("Export Scene Comming soon");
                     }
                     if(ImGui.Button("Import Scene"))
                     {
                         ShowImportSceneModal(sceneService);
+                        ImBrio.AttachToolTip("Import Scene Comming soon");
                     }
                 }
             }

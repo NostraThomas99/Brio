@@ -9,7 +9,6 @@ using Brio.Game.GPose;
 using Brio.MCDF.Game.Services;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin.Services;
-using System.Linq;
 
 namespace Brio.IPC.API;
 
@@ -39,7 +38,7 @@ public unsafe class ActorAPI(ActorSpawnService actorSpawnService, MCDFService mC
     {
         if(_gPoseService.IsGPosing == false) return null;
 
-        return _entityManager.TryGetAllActorsAsGameObject().ToArray();
+        return [.. _entityManager.TryGetAllActorsAsGameObject()];
     }
 
     public BrioApiResult LoadMCDF(IGameObject gameObject, string path)
