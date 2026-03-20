@@ -195,12 +195,6 @@ public class MCDFService : IDisposable
             finally
             {
                 _currentApplicationCount--;
-
-                // delete extracted files
-                foreach(var file in actuallyExtractedFiles)
-                {
-                    File.Delete(file);
-                }
             }
         }));
     }
