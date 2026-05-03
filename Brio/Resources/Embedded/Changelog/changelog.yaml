@@ -14,6 +14,14 @@ changelog:
           - "As a reminder! If you experience any issues please report them on Discord or on GitHub"
           - "(yes, this time for real, more features coming real soon! I promise!)"
           - "P.S. I'm sick, someone send me Nyquil"
+
+      - number: "0.7.2.1"
+        icon: ""
+        items:
+          - "Tried to fix the plugin installer from adding duplicate injuries of Brio"
+          - "Tried to fix the head from twitching when moving other bones"
+          - "Fixed the Gismo in the transform window from disappearing in certain situations"
+          - "Fixed hair color in the customization options from not being quite correct (it's still not right for Hrothgar')"
      
       - number: "0.7.2"
         icon: ""
