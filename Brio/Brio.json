@@ -11,9 +11,10 @@
     "posing",
     "animation"
   ],
-  "DownloadCount": 646779,
+  "DownloadCount": 1936717,
   "DalamudApiLevel": 15,
   "LoadRequiredState": 0,
+  "RepoUrl": "https://github.com/Etheirys/Brio",
   "LoadSync": false,
   "CanUnloadAsync": false,
   "LoadPriority": 0,
