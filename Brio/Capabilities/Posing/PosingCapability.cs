@@ -299,36 +299,33 @@ public class PosingCapability : ActorCharacterCapability
 
     public void ReconcileHead()
     {
-        _framework.RunOnTick(() =>
+        // Holy hell, This took me so long to fix and it stil breaks IK
+        var bone = SkeletonPosing.GetBone("j_kao", PoseInfoSlot.Character);
+        if(bone != null)
         {
-            // Holy hell, This took me so long to fix and it stil breaks IK
-            var bone = SkeletonPosing.GetBone("j_kao", PoseInfoSlot.Character);
-            if(bone != null)
+            var face = SkeletonPosing.PoseInfo.GetPoseInfo(bone);
+
+            // Check if j_kao or any of its parent bones are overridden
+            bool hasOverriddenParent = false;
+            var currentBone = bone.Parent;
+            while(currentBone != null)
             {
-                var face = SkeletonPosing.PoseInfo.GetPoseInfo(bone);
-
-                // Check if j_kao or any of its parent bones are overridden
-                bool hasOverriddenParent = false;
-                var currentBone = bone.Parent;
-                while(currentBone != null)
+                var parentPoseInfo = SkeletonPosing.PoseInfo.GetPoseInfo(currentBone);
+                if(parentPoseInfo.HasStacks)
                 {
-                    var parentPoseInfo = SkeletonPosing.PoseInfo.GetPoseInfo(currentBone);
-                    if(parentPoseInfo.HasStacks)
-                    {
-                        hasOverriddenParent = true;
-                        break;
-                    }
-                    currentBone = currentBone.Parent;
+                    hasOverriddenParent = true;
+                    break;
                 }
-
-                if(face.HasStacks || hasOverriddenParent)
-                {
-                    // Reconcile ONLY j_kao and its descendants to fix gizmo without affecting limbs
-                    ReconcileChildren(bone);
-                    return;
-                }
+                currentBone = currentBone.Parent;
             }
-        });
+
+            if(face.HasStacks || hasOverriddenParent)
+            {
+                // Reconcile ONLY j_kao and its descendants to fix gizmo without affecting limbs
+                ReconcileChildren(bone);
+                return;
+            }
+        }
     }
 
     public void Redo()
@@ -385,7 +382,7 @@ public class PosingCapability : ActorCharacterCapability
         var partialPoseFile = new PoseFile();
 
         ExportFaceBone(bone);
-        ClearFaceStacks(bone);
+        //ClearFaceStacks(bone);
 
         var options = new PoseImporterOptions(new BoneFilter(_posingService), TransformComponents.All, true);
         SkeletonPosing.ImportSkeletonPose(partialPoseFile, options, false);
@@ -417,25 +414,19 @@ public class PosingCapability : ActorCharacterCapability
         var facebone = SkeletonPosing.GetBone("j_kao", PoseInfoSlot.Character);
         if(facebone != null)
         {
-            _framework.RunOnTick(() =>
-            {
-                ReconcileChildren(facebone);
-            }, delayTicks: 2);
+            ReconcileChildren(facebone);
         }
     }
 
     private void Reconcile(bool reset = true, bool generateSnapshot = true)
     {
-        _framework.RunOnTick(() =>
+        var all = new PoseImporterOptions(new BoneFilter(_posingService), TransformComponents.All, true);
+        var poseFile = GeneratePoseFile();
+        if(reset)
         {
-            var all = new PoseImporterOptions(new BoneFilter(_posingService), TransformComponents.All, true);
-            var poseFile = GeneratePoseFile();
-            if(reset)
-            {
-                Reset(generateSnapshot, false);
-            }
-            ImportPose_Internal(poseFile, options: all, generateSnapshot: false);
-        }, delayTicks: 2);
+            Reset(generateSnapshot, false);
+        }
+        ImportPose_Internal(poseFile, options: all, generateSnapshot: false);
     }
 
     public PoseFile GeneratePoseFile()
@@ -500,9 +491,6 @@ public class PosingCapability : ActorCharacterCapability
                 continue;
 
             var bone = skeleton.GetFirstVisibleBone(boneName);
-
-            // Skip j_ex bones (PartialId 4) &
-            // Skip partial root bones & skeleton root
 
             if(bone == null) continue;
 
