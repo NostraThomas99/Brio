@@ -2,6 +2,10 @@
 using System.Linq;
 namespace Brio.Game.Actor.Appearance;
 
+// Brio, anam and Glamourer all report different colors,
+// I don't know who is right, but none of them match what the shader color ends up being, so I give up.
+// the Hrothgar is also always one behind, and I don't know why. but Hrothgar's colors in brio are the same as the shader. 
+// Death to colors, and butter sauce
 public class HumanData
 {
     private readonly uint[] _rawColors;
@@ -26,7 +30,7 @@ public class HumanData
         return _rawColors[start..(start + SkinLength)];
     }
 
-    //TODO fix (ken) Hrothgar are wrong here 
+    //TODO fix (ken) Hrothgar are wrong here (I give up, look above)
     public uint[] GetHairColors(Tribes tribe, Genders gender)
     {
         var start = GetTribeHairStartIndex(tribe, gender);
