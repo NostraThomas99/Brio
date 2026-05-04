@@ -296,7 +296,7 @@ public class PosingCapability : ActorCharacterCapability
             Reconcile(reset);
     }
 
-    public void ReconcileHead()
+    private void ReconcileHead()
     {
         // Holy hell, This took me so long to fix and it stil breaks IK
         var bone = SkeletonPosing.GetBone("j_kao", PoseInfoSlot.Character);
@@ -321,7 +321,7 @@ public class PosingCapability : ActorCharacterCapability
             if(face.HasStacks || hasOverriddenParent)
             {
                 // Reconcile ONLY j_kao and its descendants to fix gizmo without affecting limbs
-                ReconcileChildren(bone);
+                ReconcileChildren(bone, false);
                 return;
             }
         }
@@ -374,14 +374,15 @@ public class PosingCapability : ActorCharacterCapability
             Snapshot(reset);
     }
 
-    public void ReconcileChildren(Bone bone)
+    public void ReconcileChildren(Bone bone, bool clearFaceStacks)
     {
         // We create a partial pose so we can properly reconcile,
         // This was designed to work with j_kao and descendant, but it might work with other bones too
         var partialPoseFile = new PoseFile();
 
         ExportFaceBone(bone);
-        //ClearFaceStacks(bone);
+        if(clearFaceStacks)
+            ClearFaceStacks(bone);
 
         var options = new PoseImporterOptions(new BoneFilter(_posingService), TransformComponents.All, true);
         SkeletonPosing.ImportSkeletonPose(partialPoseFile, options, false);
@@ -413,19 +414,25 @@ public class PosingCapability : ActorCharacterCapability
         var facebone = SkeletonPosing.GetBone("j_kao", PoseInfoSlot.Character);
         if(facebone != null)
         {
-            ReconcileChildren(facebone);
+            _framework.RunOnTick(() =>
+            {
+                ReconcileChildren(facebone, true);
+            }, delayTicks: 2);
         }
     }
 
     private void Reconcile(bool reset = true, bool generateSnapshot = true)
     {
-        var all = new PoseImporterOptions(new BoneFilter(_posingService), TransformComponents.All, true);
-        var poseFile = GeneratePoseFile();
-        if(reset)
+        _framework.RunOnTick(() =>
         {
-            Reset(generateSnapshot, false);
-        }
-        ImportPose_Internal(poseFile, options: all, generateSnapshot: false);
+            var all = new PoseImporterOptions(new BoneFilter(_posingService), TransformComponents.All, true);
+            var poseFile = GeneratePoseFile();
+            if(reset)
+            {
+                Reset(generateSnapshot, false);
+            }
+            ImportPose_Internal(poseFile, options: all, generateSnapshot: false);
+        }, delayTicks: 2);
     }
 
     public PoseFile GeneratePoseFile()
@@ -653,7 +660,7 @@ public class PosingCapability : ActorCharacterCapability
                 {
                     _framework.RunOnTick(() =>
                     {
-                        ReconcileChildren(bone);
+                        ReconcileChildren(bone, true);
                     }, delayTicks: 2);
                 }
                 else
