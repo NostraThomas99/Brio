@@ -15,6 +15,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using static Brio.Game.Actor.ActorRedrawService;
+using static FFXIVClientStructs.FFXIV.Client.Graphics.Scene.Human;
 using DrawDataContainer = FFXIVClientStructs.FFXIV.Client.Game.Character.DrawDataContainer;
 
 namespace Brio.Game.Actor;
@@ -154,7 +155,6 @@ public class ActorAppearanceService : IDisposable
                         var human = character.GetHuman();
                         if(human != null)
                         {
-
                             byte[] data = new byte[108];
                             fixed(byte* ptr = data)
                             {
@@ -175,8 +175,8 @@ public class ActorAppearanceService : IDisposable
                                 {
                                     Buffer.MemoryCopy(existingAppearance.Equipment.Data, ptr + 32, 80, 80);
                                 }
-
-                                var didUpdate = human->Human.UpdateDrawData(ptr, false);
+                               
+                                var didUpdate = human->Human.UpdateDrawData((DrawData*)ptr, false);
                                 needsRedraw |= !didUpdate;
                             }
                         }
@@ -211,12 +211,11 @@ public class ActorAppearanceService : IDisposable
                 // Weapons
                 if(!needsRedraw)
                 {
-
                     if(!existingAppearance.Weapons.MainHand.Equals(appearance.Weapons.MainHand))
-                        native->DrawData.LoadWeapon(DrawDataContainer.WeaponSlot.MainHand, appearance.Weapons.MainHand, 0, 0, 0, 0);
+                        native->DrawData.LoadWeapon(DrawDataContainer.WeaponSlot.MainHand, appearance.Weapons.MainHand, 0, 0, 0, 0, false);
 
                     if(!existingAppearance.Weapons.OffHand.Equals(appearance.Weapons.OffHand))
-                        native->DrawData.LoadWeapon(DrawDataContainer.WeaponSlot.OffHand, appearance.Weapons.OffHand, 0, 0, 0, 0);
+                        native->DrawData.LoadWeapon(DrawDataContainer.WeaponSlot.OffHand, appearance.Weapons.OffHand, 0, 0, 0, 0, false);
                 }
 
                 native->DrawData.Weapon(DrawDataContainer.WeaponSlot.MainHand).ModelId = appearance.Weapons.MainHand;
